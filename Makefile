@@ -13,10 +13,10 @@ MYSQL_PASS ?= dumppassword
 #                                                            #
 ##############################################################
 
-VERSION := 0.1.0
+VERSION := 0.2.0
 BCP_DIR := /srv/backup
 BRG_BIN := /usr/bin/borg
-BRG := $(BRG_BIN) create --compression zlib,9
+BRG := $(BRG_BIN) create --compression zlib,9 --umask 0027
 
 MYSQL := /usr/bin/mysql
 MYSQLDUMP := /usr/bin/mysqldump
@@ -96,5 +96,7 @@ help:
 	@echo "\nRunning borg-make version: $(VERSION)\n"
 	@echo "This is a collection of backup targets to be used with Borg backup tool."
 	@echo "To run them, create a cron script in /etc/cron.daily with a command something like:\n"
-	@echo "\tmake -C /opt/backup BCP_HOST=<borg-server> MYSQL_PASS=<dump_password> clean etc mysqldump dpkg srv\n"
+	@echo "\tmake -C /opt/backup BCP_HOST=<borg-server> MYSQL_PASS=<dump_password> clean etc mysqldump dpkg srv\n\n"
+	@echo "To initialize empty repository, use the following command:\n"
+	@echo "\tborg init -e none --umask 0027 <BCP_USER>@<BCP_HOST>:<repository>\n"
 	@echo "Note, that this script does not support parallel make.\n"
