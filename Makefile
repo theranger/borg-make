@@ -96,5 +96,5 @@ help:
 	@echo "\nRunning borg-make version: $(VERSION)\n"
 	@echo "This is a collection of backup targets to be used with Borg backup tool."
 	@echo "To run them, create a cron script in /etc/cron.daily with a command something like:\n"
-	@echo "\tmake -C /opt/backup BCP_HOST=<rdiff-server> MYSQL_PASS=<dump_password> clean etc mysqldump dpkg srv\n"
+	@echo "\tmake -C /opt/backup BCP_HOST=<borg-server> MYSQL_PASS=<dump_password> clean etc mysqldump dpkg srv\n"
 	@echo "Note, that this script does not support parallel make.\n"
