@@ -13,7 +13,7 @@ MYSQL_PASS ?= dumppassword
 #                                                            #
 ##############################################################
 
-VERSION := 0.2.0
+VERSION := 0.3.0
 BCP_DIR := /srv/backup
 BRG_BIN := /usr/bin/borg
 BRG := $(BRG_BIN) create --compression zlib,9 --umask 0027
@@ -27,6 +27,8 @@ MONGO_DIR := $(BRG_DIR)/mongo
 
 SLAPCAT := /usr/sbin/slapcat
 LDAP_DIR := $(BRG_DIR)/ldap
+
+GITLABRAKE := /usr/bin/gitlab-rake
 
 
 all: help
@@ -79,6 +81,9 @@ mongodump: $(MONGODUMP) $(MONGO_DIR)
 slapcat: $(SLAPCAT) $(LDAP_DIR)
 	$(SLAPCAT) -l $(LDAP_DIR)/data.ldif
 
+.PHONY: gitlab
+gitlab: $(GITLABRAKE)
+	$(GITLABRAKE) gitlab:backup:create
 
 dpkg: $(BCP_DIR)
 	@dpkg --get-selections > $</dpkg-selections.txt
