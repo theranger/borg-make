@@ -30,6 +30,11 @@ LDAP_DIR := $(BCP_DIR)/ldap
 
 GITLABRAKE := /usr/bin/gitlab-rake
 
+ # This must be the same as Gitlab configuration entry gitlab_rails['backup_path'] = '/srv/backup/gitlab'
+GITLAB_DIR := $(BCP_DIR)/gitlab
+GITLAB_USER := git
+GITLAB_GROUP := git
+
 
 all: help
 
@@ -61,6 +66,13 @@ $(MONGO_DIR): $(BCP_DIR)
 $(LDAP_DIR): $(BCP_DIR)
 	mkdir -p $@
 
+# Gitlab needs special permissions for a backup to succeed
+$(GITLAB_DIR): $(BCP_DIR)
+	mkdir -p -m 0700 $@
+	chown $(GITLAB_USER) $@
+	chgrp $(GITLAB_GROUP) $(BCP_DIR)
+	chmod g+rx $(BCP_DIR)
+
 .PHONY: mysqldump
 mysqldump: $(MYSQL) $(MYSQLDUMP) $(MYSQL_DIR)
 	@for db in $$(echo 'show databases;' | $(MYSQL) -s -u$(MYSQL_USER) -p$(MYSQL_PASS)) ; do \
@@ -81,8 +93,11 @@ mongodump: $(MONGODUMP) $(MONGO_DIR)
 slapcat: $(SLAPCAT) $(LDAP_DIR)
 	$(SLAPCAT) -l $(LDAP_DIR)/data.ldif
 
+# This backup script manages Gitlab backup directory on its own
+# Reconfigure Gitlab with gitlab_rails['manage_backup_path'] = false
+# Since Borg itself is a backup versioning system, there is no need to keep multiple older Gitlab backups in $(GITLAB_DIR)
 .PHONY: gitlab
-gitlab: $(GITLABRAKE)
+gitlab: $(GITLABRAKE) $(GITLAB_DIR)
 	$(GITLABRAKE) gitlab:backup:create
 
 dpkg: $(BCP_DIR)
