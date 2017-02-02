@@ -1,3 +1,9 @@
+# This file contains sensitive information
+# Be sure to use restrictive permissions on it
+include Makefile.conf
+
+export	BORG_PASSPHRASE=$(BRG_PASSPHRASE)
+
 # What to back up and where
 BCP_HOST ?= localhost
 BCP_USER ?= $(shell hostname)
@@ -13,7 +19,7 @@ MYSQL_PASS ?= dumppassword
 #                                                            #
 ##############################################################
 
-VERSION := 0.4.0
+VERSION := 0.5.0
 BCP_DIR := /srv/backup
 BRG_BIN := /usr/bin/borg
 BRG := $(BRG_BIN) create --compression zlib,9 --umask 0027
@@ -106,6 +112,13 @@ dpkg: $(BCP_DIR)
 .PHONY: update
 update:
 	wget -O Makefile https://raw.githubusercontent.com/theranger/borg-make/master/Makefile
+
+.PHONY: update-conf
+update-conf:
+	wget --backups=1 https://raw.githubusercontent.com/theranger/borg-make/master/Makefile.conf
+
+.PHONY: update-all
+update-all: update update-conf
 
 .PHONY: clean
 clean:
