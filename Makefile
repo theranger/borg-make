@@ -20,13 +20,13 @@ BRG := $(BRG_BIN) create --compression zlib,9 --umask 0027
 
 MYSQL := /usr/bin/mysql
 MYSQLDUMP := /usr/bin/mysqldump
-MYSQL_DIR := $(BRG_DIR)/mysql
+MYSQL_DIR := $(BCP_DIR)/mysql
 
 MONGODUMP := /usr/bin/mongodump
-MONGO_DIR := $(BRG_DIR)/mongo
+MONGO_DIR := $(BCP_DIR)/mongo
 
 SLAPCAT := /usr/sbin/slapcat
-LDAP_DIR := $(BRG_DIR)/ldap
+LDAP_DIR := $(BCP_DIR)/ldap
 
 GITLABRAKE := /usr/bin/gitlab-rake
 
