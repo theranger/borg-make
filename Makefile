@@ -19,10 +19,13 @@ MYSQL_PASS ?= dumppassword
 #                                                            #
 ##############################################################
 
-VERSION := 0.6.2
+VERSION := 0.7.0
 BCP_DIR := /srv/backup
 BRG_BIN := /usr/bin/borg
 BRG := $(BRG_BIN) create --compression zlib,9 --umask 0027
+BRGSTAT := $(BRG_BIN) info
+BRGCHECK := $(BRG_BIN) check -v
+
 SSH := $(shell which ssh)
 
 MYSQL := /usr/bin/mysql
@@ -59,18 +62,26 @@ unlock: $(SSH)
 .PHONY: etc
 etc: $(BRG_BIN)
 	$(BRG) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) /$@
+	$(BRGSTAT) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat > $@/status.txt'
+	$(BRGCHECK) $(BCP_USER)@$(BCP_HOST):$@ 2>&1 | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat >> $@/status.txt'
 
 .PHONY: home
 home: $(BRG_BIN)
 	$(BRG) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) /$@
+	$(BRGSTAT) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat > $@/status.txt'
+	$(BRGCHECK) $(BCP_USER)@$(BCP_HOST):$@ 2>&1 | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat >> $@/status.txt'
 
 .PHONY: opt
 opt: $(BRG_BIN)
 	$(BRG) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) /$@
+	$(BRGSTAT) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat > $@/status.txt'
+	$(BRGCHECK) $(BCP_USER)@$(BCP_HOST):$@ 2>&1 | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat >> $@/status.txt'
 
 .PHONY: srv
 srv: $(BRG_BIN)
 	$(BRG) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) /$@
+	$(BRGSTAT) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat > $@/status.txt'
+	$(BRGCHECK) $(BCP_USER)@$(BCP_HOST):$@ 2>&1 | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat >> $@/status.txt'
 
 $(MYSQL_DIR): $(BCP_DIR)
 	mkdir -p $@
