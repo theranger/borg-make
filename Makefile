@@ -19,7 +19,7 @@ MYSQL_PASS ?= dumppassword
 #                                                            #
 ##############################################################
 
-VERSION := 0.6.0
+VERSION := 0.6.1
 BCP_DIR := /srv/backup
 BRG_BIN := /usr/bin/borg
 BRG := $(BRG_BIN) create --compression zlib,9 --umask 0027
@@ -54,7 +54,7 @@ lock: $(SSH)
 
 .PHONY: unlock
 unlock: $(SSH)
-	$(SSH) $(BCP_USER)@$(BCP_HOST) 'rm .lock'
+	$(SSH) $(BCP_USER)@$(BCP_HOST) 'rm -f .lock'
 
 .PHONY: etc
 etc: $(BRG_BIN)
