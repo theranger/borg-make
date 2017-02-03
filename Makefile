@@ -19,10 +19,11 @@ MYSQL_PASS ?= dumppassword
 #                                                            #
 ##############################################################
 
-VERSION := 0.5.0
+VERSION := 0.6.0
 BCP_DIR := /srv/backup
 BRG_BIN := /usr/bin/borg
 BRG := $(BRG_BIN) create --compression zlib,9 --umask 0027
+SSH := $(shell which ssh)
 
 MYSQL := /usr/bin/mysql
 MYSQLDUMP := /usr/bin/mysqldump
@@ -46,6 +47,14 @@ all: help
 
 $(BCP_DIR):
 	mkdir -p -m 0700 $@
+
+.PHONY: lock
+lock: $(SSH)
+	$(SSH) $(BCP_USER)@$(BCP_HOST) 'touch .lock'
+
+.PHONY: unlock
+unlock: $(SSH)
+	$(SSH) $(BCP_USER)@$(BCP_HOST) 'rm .lock'
 
 .PHONY: etc
 etc: $(BRG_BIN)
@@ -131,5 +140,5 @@ help:
 	@echo "To run them, create a cron script in /etc/cron.daily with a command something like:\n"
 	@echo "\tmake -C /opt/backup BCP_HOST=<borg-server> MYSQL_PASS=<dump_password> clean etc mysqldump dpkg srv\n\n"
 	@echo "To initialize empty repository, use the following command:\n"
-	@echo "\tborg init -e none --umask 0027 <BCP_USER>@<BCP_HOST>:<repository>\n"
+	@echo "\tborg init -e keyfile --umask 0007 <BCP_USER>@<BCP_HOST>:<repository>\n"
 	@echo "Note, that this script does not support parallel make.\n"
