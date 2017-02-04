@@ -19,7 +19,7 @@ MYSQL_PASS ?= dumppassword
 #                                                            #
 ##############################################################
 
-VERSION := 0.7.0
+VERSION := 0.7.1
 BCP_DIR := /srv/backup
 BRG_BIN := /usr/bin/borg
 BRG := $(BRG_BIN) create --compression zlib,9 --umask 0027
@@ -106,7 +106,7 @@ mysqldump: $(MYSQL) $(MYSQLDUMP) $(MYSQL_DIR)
 		if [ "$${db}" = "information_schema" ] || [ "$${db}" = "performance_schema" ]; then \
 			echo " Skipped."; \
 		else \
-			$(MYSQLDUMP) --opt -u$(MYSQL_USER) -p$(MYSQL_PASS) $${db} | gzip -c > $(MYSQL_DIR)/$${db}.txt.gz; \
+			$(MYSQLDUMP) --opt -u$(MYSQL_USER) -p$(MYSQL_PASS) $${db} > $(MYSQL_DIR)/$${db}.sql; \
 			echo "Done."; \
 		fi; \
 	done
