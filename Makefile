@@ -23,6 +23,7 @@ VERSION := 0.7.1
 BCP_DIR := /srv/backup
 BRG_BIN := /usr/bin/borg
 BRG := $(BRG_BIN) create --compression zlib,9 --umask 0027
+BRGINIT := $(BRG_BIN) init --encryption keyfile --umask 0027
 BRGSTAT := $(BRG_BIN) info
 BRGCHECK := $(BRG_BIN) check -v
 
@@ -50,6 +51,10 @@ all: help
 
 $(BCP_DIR):
 	mkdir -p -m 0700 $@
+
+.PHONY: init
+init: $(BRG_BIN)
+	$(BRGINIT) $(BCP_USER)@$(BCP_HOST):$(REPO)
 
 .PHONY: lock
 lock: $(SSH)
