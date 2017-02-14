@@ -6,7 +6,7 @@ export	BORG_PASSPHRASE=$(BRG_PASSPHRASE)
 
 # What to back up and where
 BCP_HOST ?= localhost
-BCP_USER ?= $(shell hostname)
+BCP_USER ?= $(shell hostname -f)
 BCP_NAME ?= {now:%Y-%m-%d}
 
 # MySQL configurable options
