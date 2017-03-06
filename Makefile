@@ -49,10 +49,10 @@ GITLAB_GROUP := git
 OC_USER ?= www-data
 OC_CMD ?= owncloud/occ
 OC := su - $(OC_USER) -c
-OC_DB_USER ?= $(shell $(OC) "$(OC_CMD) config:system:get dbuser")
-OC_DB_NAME ?= $(shell $(OC) "$(OC_CMD) config:system:get dbname")
-OC_DB_PASSWORD ?= $(shell $(OC) "$(OC_CMD) config:system:get dbpassword")
-OC_DATA_DIR ?= $(shell $(OC) "$(OC_CMD) config:system:get datadirectory")
+OC_DB_USER ?= $(shell $(OC) "$(OC_CMD) config:system:get dbuser | tail -n1")
+OC_DB_NAME ?= $(shell $(OC) "$(OC_CMD) config:system:get dbname | tail -n1")
+OC_DB_PASSWORD ?= $(shell $(OC) "$(OC_CMD) config:system:get dbpassword | tail -n1")
+OC_DATA_DIR ?= $(shell $(OC) "$(OC_CMD) config:system:get datadirectory | tail -n1")
 
 all: help
 
@@ -104,7 +104,7 @@ oc_end:
 	$(OC) "$(OC_CMD) maintenance:mode --off"
 
 .PHONY: owncloud
-owncloud: $(MYSQLDUMP)
+owncloud: $(MYSQLDUMP) oc_start
 	$(MYSQLDUMP) -u$(OC_DB_USER) -p$(OC_DB_PASSWORD) $(OC_DB_NAME) > $(OC_DATA_DIR)/$(OC_DB_NAME).sql
 	$(BRG) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) $(OC_DATA_DIR)
 	$(BRGSTAT) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat > $@/status.txt'
