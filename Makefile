@@ -2,7 +2,7 @@
 # Be sure to use restrictive permissions on it
 include Makefile.conf
 
-export	BORG_PASSPHRASE=$(BRG_PASSPHRASE)
+export BORG_PASSPHRASE=$(BRG_PASSPHRASE)
 
 # What to back up and where
 BCP_HOST ?= localhost
