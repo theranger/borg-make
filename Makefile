@@ -46,6 +46,13 @@ GITLAB_DIR := $(BCP_DIR)/gitlab
 GITLAB_USER := git
 GITLAB_GROUP := git
 
+OC_USER ?= www-data
+OC_CMD ?= owncloud/occ
+OC := su - $(OC_USER) -c
+OC_DB_USER ?= $(shell $(OC) "$(OC_CMD) config:system:get dbuser")
+OC_DB_NAME ?= $(shell $(OC) "$(OC_CMD) config:system:get dbname")
+OC_DB_PASSWORD ?= $(shell $(OC) "$(OC_CMD) config:system:get dbpassword")
+OC_DATA_DIR ?= $(shell $(OC) "$(OC_CMD) config:system:get datadirectory")
 
 all: help
 
@@ -87,6 +94,21 @@ srv: $(BRG_BIN)
 	$(BRG) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) /$@
 	$(BRGSTAT) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat > $@/status.txt'
 	$(BRGCHECK) $(BCP_USER)@$(BCP_HOST):$@ 2>&1 | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat >> $@/status.txt'
+
+.PHONY: oc_start
+oc_start:
+	$(OC) "$(OC_CMD) maintenance:mode --on"
+
+.PHONY: oc_end
+oc_end:
+	$(OC) "$(OC_CMD) maintenance:mode --off"
+
+.PHONY: owncloud
+owncloud: $(MYSQLDUMP)
+	$(MYSQLDUMP) -u$(OC_DB_USER) -p$(OC_DB_PASSWORD) $(OC_DB_NAME) > $(OC_DATA_DIR)/$(OC_DB_NAME).sql
+	$(BRG) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) $(OC_DATA_DIR)
+	$(BRGSTAT) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat > $@/status.txt'
+   	$(BRGCHECK) $(BCP_USER)@$(BCP_HOST):$@ 2>&1 | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat >> $@/status.txt'
 
 $(MYSQL_DIR): $(BCP_DIR)
 	mkdir -p $@
