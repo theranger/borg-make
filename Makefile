@@ -108,7 +108,7 @@ owncloud: $(MYSQLDUMP)
 	$(MYSQLDUMP) -u$(OC_DB_USER) -p$(OC_DB_PASSWORD) $(OC_DB_NAME) > $(OC_DATA_DIR)/$(OC_DB_NAME).sql
 	$(BRG) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) $(OC_DATA_DIR)
 	$(BRGSTAT) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat > $@/status.txt'
-   	$(BRGCHECK) $(BCP_USER)@$(BCP_HOST):$@ 2>&1 | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat >> $@/status.txt'
+	$(BRGCHECK) $(BCP_USER)@$(BCP_HOST):$@ 2>&1 | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat >> $@/status.txt'
 
 $(MYSQL_DIR): $(BCP_DIR)
 	mkdir -p $@
