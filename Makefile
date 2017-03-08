@@ -161,7 +161,7 @@ slapcat: $(SLAPCAT) $(LDAP_DIR)
 
 .PHONY: cyrdump
 cyrdump: $(CYRDUMP) $(CYRUS_DIR)
-	$(CYRDUMP) -d -f $(CYRUS_DIR)/mailboxes.dump
+	$(CYRDUMP) -d > $(CYRUS_DIR)/mailboxes.dump
 
 # This backup script manages Gitlab backup directory on its own
 # Reconfigure Gitlab with gitlab_rails['manage_backup_path'] = false
