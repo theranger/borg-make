@@ -39,6 +39,10 @@ MONGO_DIR := $(BCP_DIR)/mongo
 SLAPCAT := /usr/sbin/slapcat
 LDAP_DIR := $(BCP_DIR)/ldap
 
+CYRDUMP := /usr/lib/cyrus/bin/ctl_mboxlist
+CYRUS_DIR := $(BCP_DIR)/cyrus
+CYRUS_USER := cyrus
+
 GITLABRAKE := /usr/bin/gitlab-rake
 
  # This must be the same as Gitlab configuration entry gitlab_rails['backup_path'] = '/srv/backup/gitlab'
@@ -127,6 +131,11 @@ $(GITLAB_DIR): $(BCP_DIR)
 	chgrp $(GITLAB_GROUP) $(BCP_DIR)
 	chmod g+rx $(BCP_DIR)
 
+# Cyrus dump needs special permissions for a backup directory
+$(CYRUS_DIR): $(BCP_DIR)
+	mkdir -p -m 0700 $@
+	chown $(CYRUS_USER) $@
+
 .PHONY: mysqldump
 mysqldump: $(MYSQL) $(MYSQLDUMP) $(MYSQL_DIR)
 	@for db in $$(echo 'show databases;' | $(MYSQL) -s -u$(MYSQL_USER) -p$(MYSQL_PASS)) ; do \
@@ -146,6 +155,10 @@ mongodump: $(MONGODUMP) $(MONGO_DIR)
 .PHONY: slapcat
 slapcat: $(SLAPCAT) $(LDAP_DIR)
 	$(SLAPCAT) -l $(LDAP_DIR)/data.ldif
+
+.PHONY: cyrdump
+cyrdump: $(CYRDUMP) $(CYRUS_DIR)
+	$(CYRDUMP) -d -f $(CYRUS_DIR)/mailboxes.dump
 
 # This backup script manages Gitlab backup directory on its own
 # Reconfigure Gitlab with gitlab_rails['manage_backup_path'] = false
