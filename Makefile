@@ -42,6 +42,7 @@ LDAP_DIR := $(BCP_DIR)/ldap
 CYRDUMP := /usr/lib/cyrus/bin/ctl_mboxlist
 CYRUS_DIR := $(BCP_DIR)/cyrus
 CYRUS_USER := cyrus
+CYRUS_GROUP := mail
 
 GITLABRAKE := /usr/bin/gitlab-rake
 
@@ -135,6 +136,8 @@ $(GITLAB_DIR): $(BCP_DIR)
 $(CYRUS_DIR): $(BCP_DIR)
 	mkdir -p -m 0700 $@
 	chown $(CYRUS_USER) $@
+	chgrp $(CYRUS_GROUP) $(BCP_DIR)
+	chmod g+rx $(BCP_DIR)
 
 .PHONY: mysqldump
 mysqldump: $(MYSQL) $(MYSQLDUMP) $(MYSQL_DIR)
