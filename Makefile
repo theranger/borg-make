@@ -129,12 +129,12 @@ owncloud: $(MYSQLDUMP) oc_start
 	$(BRGCHECK) $(BCP_USER)@$(BCP_HOST):$@ 2>&1 | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat >> $@/status.txt'
 
 .PHONY: atl_start
-atl_start: $(ATLASSIAN_NGE)
+atl_start: $(ATLASSIAN_NGE) $(ATLASSIAN_NGA)
 	rm $(ATLASSIAN_NGE)
 	systemctl reload nginx
 
 .PHONY: atl_end
-atl_end: $(ATLASSIAN_NGA) $(ATLASSIAN_NGE)
+atl_end: $(ATLASSIAN_NGA)
 	ln -s $(ATLASSIAN_NGA) $(ATLASSIAN_NGE)
 	systemctl reload nginx
 
