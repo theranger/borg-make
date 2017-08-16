@@ -13,13 +13,17 @@ BCP_NAME ?= {now:%Y-%m-%d}
 MYSQL_USER ?= dump
 MYSQL_PASS ?= dumppassword
 
+# Nginx proxy settings for Atlassian software
+NGINX_ATE ?= /etc/nginx/sites-enabled/atlassian
+NGINX_ATA ?= /etc/nginx/sites-available/atlassian
+
 ##############################################################
 #                                                            #
 #        Usually no need to change stuff below               #
 #                                                            #
 ##############################################################
 
-VERSION := 0.7.1
+VERSION := 0.8.0
 BCP_DIR := /srv/backup
 BRG_BIN := /usr/bin/borg
 BRG := $(BRG_BIN) create --compression zlib,9 --umask 0027 $(ARGS)
@@ -115,6 +119,16 @@ owncloud: $(MYSQLDUMP) oc_start
 	$(OC) "$(OC_CMD) maintenance:mode --off"
 	$(BRGSTAT) $(BCP_USER)@$(BCP_HOST):$@::$(BCP_NAME) | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat > $@/status.txt'
 	$(BRGCHECK) $(BCP_USER)@$(BCP_HOST):$@ 2>&1 | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat >> $@/status.txt'
+
+.PHONY: atl_start
+atl_start:
+	rm $(NGINX_ATE)
+	systemctl reload nginx
+
+.PHONY: atl_end
+atl_end:
+	ln -s $(NGINX_ATA) $(NGINX_ATE)
+	systemctl reload nginx
 
 $(MYSQL_DIR): $(BCP_DIR)
 	mkdir -p $@
