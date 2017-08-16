@@ -63,6 +63,11 @@ OC_DB_NAME ?= $(shell $(OC) "$(OC_CMD) config:system:get dbname | tail -n1")
 OC_DB_PASSWORD ?= $(shell $(OC) "$(OC_CMD) config:system:get dbpassword | tail -n1")
 OC_DATA_DIR ?= $(shell $(OC) "$(OC_CMD) config:system:get datadirectory | tail -n1")
 
+PG_DUMP := /usr/bin/pg_dump
+PG_DIR := $(BCP_DIR)/postgres
+PG_USER := postgres
+PG_GROUP := postgres
+
 all: help
 
 $(BCP_DIR):
@@ -151,6 +156,13 @@ $(CYRUS_DIR): $(BCP_DIR)
 	mkdir -p -m 0700 $@
 	chown $(CYRUS_USER) $@
 	chgrp $(CYRUS_GROUP) $(BCP_DIR)
+	chmod g+rx $(BCP_DIR)
+
+# Postgres dump need special permissions for a backup directory
+$(PG_DIR): $(BCP_DIR)
+	mkdir -p -m 0700 $@
+	chown $(PG_USER) $@
+	chgrp $(PG_GROUP) $(BCP_DIR)
 	chmod g+rx $(BCP_DIR)
 
 .PHONY: mysqldump
