@@ -14,8 +14,7 @@ MYSQL_USER ?= dump
 MYSQL_PASS ?= dumppassword
 
 # Nginx proxy settings for Atlassian software
-ATLASSIAN_NGE ?= /etc/nginx/sites-enabled/atlassian
-ATLASSIAN_NGA ?= /etc/nginx/sites-available/atlassian
+ATLASSIAN_NG ?= atlassian
 ATLASSIAN_DB ?= atlassian
 
 ##############################################################
@@ -68,6 +67,9 @@ PG_DUMP := /usr/bin/pg_dump
 PG_DIR := $(BCP_DIR)/postgres
 PG_USER := postgres
 PG_GROUP := postgres
+
+ATLASSIAN_NGE := /etc/nginx/sites-enabled/$(ATLASSIAN_NG)
+ATLASSIAN_NGA := /etc/nginx/sites-available/$(ATLASSIAN_NG)
 
 all: help
 
