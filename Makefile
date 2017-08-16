@@ -23,7 +23,7 @@ ATLASSIAN_DB ?= atlassian
 #                                                            #
 ##############################################################
 
-VERSION := 0.8.0
+VERSION := 0.8.1
 BCP_DIR := /srv/backup
 BRG_BIN := /usr/bin/borg
 BRG := $(BRG_BIN) create --compression zlib,9 --umask 0027 $(ARGS)
