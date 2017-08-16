@@ -14,8 +14,9 @@ MYSQL_USER ?= dump
 MYSQL_PASS ?= dumppassword
 
 # Nginx proxy settings for Atlassian software
-NGINX_ATE ?= /etc/nginx/sites-enabled/atlassian
-NGINX_ATA ?= /etc/nginx/sites-available/atlassian
+ATLASSIAN_NGE ?= /etc/nginx/sites-enabled/atlassian
+ATLASSIAN_NGA ?= /etc/nginx/sites-available/atlassian
+ATLASSIAN_DB ?= atlassian
 
 ##############################################################
 #                                                            #
@@ -126,14 +127,18 @@ owncloud: $(MYSQLDUMP) oc_start
 	$(BRGCHECK) $(BCP_USER)@$(BCP_HOST):$@ 2>&1 | $(SSH) $(BCP_USER)@$(BCP_HOST) 'cat >> $@/status.txt'
 
 .PHONY: atl_start
-atl_start:
-	rm $(NGINX_ATE)
+atl_start: $(ATLASSIAN_NGE)
+	rm $(ATLASSIAN_NGE)
 	systemctl reload nginx
 
 .PHONY: atl_end
-atl_end:
-	ln -s $(NGINX_ATA) $(NGINX_ATE)
+atl_end: $(ATLASSIAN_NGA) $(ATLASSIAN_NGE)
+	ln -s $(ATLASSIAN_NGA) $(ATLASSIAN_NGE)
 	systemctl reload nginx
+
+.PHONY: atlassian
+atlassian: $(PG_DUMP) $(PG_DIR) atl_start
+	su - $(PG_USER) -c "$(PG_DUMP) $(ATLASSIAN_DB) > $(PG_DIR)/$(ATLASSIAN_DB).sql"
 
 $(MYSQL_DIR): $(BCP_DIR)
 	mkdir -p $@
